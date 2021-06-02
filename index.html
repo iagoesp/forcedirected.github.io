@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <style>
+
+    .links line {
+      stroke: #999;
+      stroke-opacity: 0.6;
+    }
+
+    .nodes circle {
+      stroke: #fff;
+      stroke-width: 1.5px;
+    }
+
+    text {
+      font-family: sans-serif;
+      font-size: 10px;
+    }
+
+    </style>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css" integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l" crossorigin="anonymous">
+    
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.min.js" integrity="sha384-+YQ4JLhjyBLPDQt//I+STsc9iw4uQqACwlvpslubQzn4u2UU2UFM80nGisd026JF" crossorigin="anonymous"></script>
+
+    <script src="https://cdn.rawgit.com/eligrey/FileSaver.js/e9d941381475b5df8b7d7691013401e171014e89/FileSaver.min.js"></script>
+  </head>
+  <body class="m-2">
+    <div id="container" class="container">
+      <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+          <a class="nav-link active" id="insercao-manual" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Inserção Manual</a>
+        </li>
+        <li class="nav-item ml-5">
+          <a class="nav-link" id="inputFixo1">Input Fixo 1</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" id="inputFixo2">Input Fixo 2</a>
+        </li>
+        <li class="nav-item ml-5">
+          <a class="nav-link" id="resetDraw">Refazer</a>
+        </li>
+      </ul>
+      <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active m-4" id="home" role="tabpanel" aria-labelledby="insercao-manual">
+          <div class="row">
+            <div class="col-sm">
+              <form>
+                <div class="row">
+                  <div class="col-sm">
+                    <label for="nameNode">Insira os nomes dos vértices, se houver</label><br>
+                    <input type="text" id="nameNode" name="nameNode" placeholder="(Exemplo: No1,No2,No3,No4)"><br>
+                    <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Para criar os vértices por input, é necessário inserir um nós por vez ou separá-los por vírgulas e sem espaços.    Exemplo: No1,No2,No3,No4,...,NoN. Caso contrário, basta clicar no botão 'Inserir vértices' que irá criar vértices com id numeral natural." disabled>
+                      Dica
+                    </button>
+                  </div>
+                  <div class="col-sm">
+                    <label for="groupNode">Insira o respectivo grupo desse nó, se houver</label><br>
+                    <input type="text" id="groupNode" name="groupNode" placeholder="(Opcional - Exemplo: 1,1,2,3)"><br>
+                    <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Sendo opcional essa inserção, para identificar o grupo respectivo de cada vértice, é necessário inserir um número natural por vez ou separá-los por vírgulas e sem espaços, da mesma quantidade dos vértices.   Exemplo: 1,2,3,4,...,N. Para cada número desse, haverá uma cor atribuída." disabled>
+                      Dica
+                    </button>
+                  </div>
+                  <div class="col-sm">
+                    <button id="inserirNodesManual" type="button" class="btn btn-primary mt-4">Inserir Vértice</button><br>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-sm">
+              <form>
+              <div class="row">
+                <div class="col-sm">
+                  <label for="nameLink">Insira o nome do link, se houver.</label><br>
+                  <input placeholder="(Exemplo: No1,No2;No1,No3;No3,No4)" type="text" id="nameLink" name="nameLink"><br>
+                  <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Definindo Sendo opcional essa inserção, para identificar o grupo respectivo de cada vértice, é necessário inserir um número natural por vez ou separá-los por vírgulas e sem espaços, da mesma quantidade dos vértices.   Exemplo: 1,2,3,4,...,N. Para cada número desse, haverá uma cor atribuída." disabled>
+                    Dica
+                  </button>
+                </div>
+                <div class="col-sm">
+                  <button id="inserirLinks" type="button" class="btn btn-primary">Inserir Link</button>
+                </div>
+              </div>
+            </form>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-sm">
+              <table class="table" id="tableNodes">
+                <thead>
+                  <tr><th>Nodes</th><th>Group</th><th>Action</th></tr>
+                  <tr><th ><br/></th><th> </th><th> </th></tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                  <tr >
+                    <th colspan="3">
+                      <!--<button id="inserirNodes" type="button" class="btn btn-primary">Inserir Nodes</button>-->
+                    </th>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+            <div class="col-sm">
+              <table class="table" id="tableLinks">
+                <thead>
+                  <tr><th colspan="2" class="text-center">Links</th><th>Action</th></tr>
+                  <tr><th>Source</th><th>Target</th></tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                  <tr>
+                    <th colspan="3">
+                      <!--<button id="inserirLinks" type="button" class="btn btn-primary">Inserir Links</button>-->
+                    </th>
+                  </tr>
+              </tfoot>
+              </table>
+            </div>
+            <div class="col-sm">
+              <button id="gerarManual" type="button" class="btn btn-primary" disabled>Gerar grafo</button>
+              <button type="button" class="btn btn-secondary" data-toggle="tooltip" data-placement="bottom" title="Para visualizar o grafo inteiro, é necessário mover pelo menos um nó que está sendo visualizado." disabled>
+                Dica
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm">
+        <button id="voltar" type="button" class="btn btn-primary">Voltar aba anterior</button>
+        <button id="gerarPDF" type="button" class="btn btn-primary">Salvar em PDF</button>
+      </div>
+    </div>
+    <script src="scripts.js"></script>
+  </body>
+</html>
